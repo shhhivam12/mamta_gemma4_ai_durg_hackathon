@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% block title %}Mamta - My Health Charts{% endblock %}
+{% block header_title %}My Health Charts{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Gestational Week Progress Banner -->
+  <div class="card" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary)); border-color: rgba(247, 68, 90, 0.2);">
+    <div>
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--brand-primary); letter-spacing: 0.08em; text-transform: uppercase;">
+        Pregnancy Timeline
+      </div>
+      <div style="font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin: 4px 0;">
+        Week <span id="dashWeek">24</span> — Month <span id="dashTrim">6</span>
+      </div>
+      <div style="font-size: 0.9rem; color: var(--text-muted); max-width: 650px;" id="dashMilestone">
+        Your baby's lungs are forming. It's important to monitor your blood pressure and swelling regularly.
+      </div>
+    </div>
+    <div style="text-align: right; min-width: 180px;">
+      <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Expected Due Date</div>
+      <div style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); font-family: 'JetBrains Mono', monospace;" id="dashEdd">2026-11-12</div>
+      <div style="font-size: 0.75rem; color: var(--status-green); font-weight: 700; margin-top: 4px;">112 Days Remaining</div>
+    </div>
+  </div>
+
+  <!-- Telemetry Charts Grid (MAP & Blood Glucose) -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px;">
+    <!-- BP Score Chart -->
+    <div class="card" style="margin-bottom: 0;">
+      <div class="card-title">
+        <span>Blood Pressure Health Score</span>
+        <span style="font-size: 0.75rem; color: var(--brand-primary); font-family: 'JetBrains Mono', monospace;">Warning Score: 105</span>
+      </div>
+      <div style="height: 250px; position: relative;">
+        <canvas id="mapChart"></canvas>
+      </div>
+      <div style="font-size: 0.78rem; color: var(--text-subtle); margin-top: 12px;">
+        A score above 105 means your blood pressure is too high and you need to see a doctor immediately.
+      </div>
+    </div>
+
+    <!-- Fetal Kick Velocity Chart -->
+    <div class="card" style="margin-bottom: 0;">
+      <div class="card-title">
+        <span>Baby Kick Monitor</span>
+        <span style="font-size: 0.75rem; color: var(--status-green); font-family: 'JetBrains Mono', monospace;">Minimum: 10 in 2 hrs</span>
+      </div>
+      <div style="height: 250px; position: relative;">
+        <canvas id="kickChart"></canvas>
+      </div>
+      <div style="font-size: 0.78rem; color: var(--text-subtle); margin-top: 12px;">
+        Make sure you feel your baby move at least 10 times in a 2-hour period.
+      </div>
+    </div>
+  </div>
+
+  <!-- Medicine Spacing Tracker Table -->
+  <div class="card" style="margin-bottom: 0;">
+    <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
+      <span>My Medicine Schedule</span>
+      <button class="btn-primary" onclick="alert('Sent this week\'s charts to your Doctor via Gemma 4.');" style="padding: 6px 14px; font-size: 0.8rem; background-color: var(--status-green); box-shadow: none;">Send Data to Doctor</button>
+    </div>
+    <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+      Remember: Do not take Iron (IFA) and Calcium pills together. Keep a gap of 2 hours so your body can absorb them properly.
+    </div>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border-strong); color: var(--text-muted);">
+            <th style="padding: 12px 8px;">Date & Time</th>
+            <th style="padding: 12px 8px;">Medicine</th>
+            <th style="padding: 12px 8px;">Dose</th>
+            <th style="padding: 12px 8px;">Safety Check</th>
+          </tr>
+        </thead>
+        <tbody id="medTableBody">
+          <!-- Populated by JS -->
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 12px 8px; font-family: 'JetBrains Mono', monospace;">Loading...</td>
+            <td style="padding: 12px 8px; font-weight: 600;">Loading...</td>
+            <td style="padding: 12px 8px;">-</td>
+            <td style="padding: 12px 8px;">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Today's Checklist -->
+  <div class="card" style="margin-bottom: 0;">
+    <div class="card-title">
+      <span>Today's Health Checklist</span>
+      <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted);">Daily Reminders</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;" id="checklistGrid">
+      <div style="padding: 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: var(--bg-primary);">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--brand-primary); text-transform: uppercase;">Medicine</div>
+        <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin: 6px 0;">Take Iron (IFA) pill 2 hours away from Calcium</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Iron ki goli lijiye (Calcium se 2 ghante door)</div>
+      </div>
+      <div style="padding: 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: var(--bg-primary);">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--brand-primary); text-transform: uppercase;">Medicine</div>
+        <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin: 6px 0;">Take Calcium pill after lunch</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Calcium ki goli lijiye</div>
+      </div>
+      <div style="padding: 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: var(--bg-primary);">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--brand-primary); text-transform: uppercase;">Body Check</div>
+        <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin: 6px 0;">Check your feet for any swelling</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Pairon mein sujan check karein</div>
+      </div>
+      <div style="padding: 16px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background-color: var(--bg-primary);">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--brand-primary); text-transform: uppercase;">Rest</div>
+        <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin: 6px 0;">Rest on your left side for 45 minutes</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Bayi karwat let kar aaram karein</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let mapChartInstance = null;
+  let kickChartInstance = null;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const res = await fetch('/api/health-summary?user_id=default_patient_01&days=30');
+      const data = await res.json();
+      
+      // Render BP Score Chart
+      const ctxMap = document.getElementById('mapChart').getContext('2d');
+      const vitals = data.recent_vitals || [];
+      
+      let labelsMap = vitals.map(v => v.date || 'Recent');
+      let dataMap = vitals.map(v => v.map_value || 90);
+
+      mapChartInstance = new Chart(ctxMap, {
+        type: 'line',
+        data: {
+          labels: labelsMap,
+          datasets: [{
+            label: 'Blood Pressure Score',
+            data: dataMap,
+            borderColor: '#f7445a',
+            backgroundColor: 'rgba(247, 68, 90, 0.1)',
+            borderWidth: 3,
+            tension: 0.3,
+            fill: true,
+            pointBackgroundColor: '#000000',
+            pointRadius: 5
+          }, {
+            label: 'Danger Zone (105)',
+            data: labelsMap.map(() => 105),
+            borderColor: '#dc2626',
+            borderWidth: 2,
+            borderDash: [6, 6],
+            pointRadius: 0,
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { min: 70, max: 120 }
+          }
+        }
+      });
+
+      // Render Kick Chart
+      const ctxKick = document.getElementById('kickChart').getContext('2d');
+      const kicks = data.recent_kick_logs || [];
+      let labelsKick = kicks.map(k => k.date || 'Recent');
+      let dataKick = kicks.map(k => k.movement_count || 12);
+
+      kickChartInstance = new Chart(ctxKick, {
+        type: 'bar',
+        data: {
+          labels: labelsKick,
+          datasets: [{
+            label: 'Baby Kicks per 2-Hour Period',
+            data: dataKick,
+            backgroundColor: '#000000',
+            borderRadius: 6
+          }, {
+            label: 'Minimum Goal (10)',
+            data: labelsKick.map(() => 10),
+            type: 'line',
+            borderColor: '#059669',
+            borderWidth: 2,
+            borderDash: [4, 4],
+            pointRadius: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { min: 0, max: 25 }
+          }
+        }
+      });
+
+      // Populate Medications
+      if (data.recent_medications && data.recent_medications.length > 0) {
+        const tbody = document.getElementById('medTableBody');
+        tbody.innerHTML = "";
+        data.recent_medications.reverse().forEach(m => {
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = "1px solid var(--border-color)";
+          const timeStr = m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Recent';
+          const dateStr = m.date || 'Today';
+          tr.innerHTML = `
+            <td style="padding: 12px 8px; font-family: 'JetBrains Mono', monospace;">${dateStr}, ${timeStr}</td>
+            <td style="padding: 12px 8px; font-weight: 600;">${m.medication}</td>
+            <td style="padding: 12px 8px;">${m.dosage}</td>
+            <td style="padding: 12px 8px;"><span style="color: var(--status-green); font-weight: 700;">SAFE GAP</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    } catch(e) {
+      console.error("Dashboard render error:", e);
+    }
+  });
+</script>
+{% endblock %}

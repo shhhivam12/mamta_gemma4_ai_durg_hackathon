@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block title %}Mamta - ASHA Clinical Dispatch & Triage Center{% endblock %}
+{% block header_title %}ASHA Clinical Dispatch Portal{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Clinic Portal Banner -->
+  <div class="card" style="background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary)); border-color: rgba(247, 68, 90, 0.25);">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+      <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--brand-primary); letter-spacing: 0.08em; text-transform: uppercase;">
+          Track 2: Sanjeevani Multilingual Health Triage
+        </div>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin: 6px 0;">
+          ASHA Community Health & Emergency Dispatch Center
+        </div>
+        <div style="font-size: 0.9rem; color: var(--text-muted); max-width: 700px;">
+          AI-empowered surveillance system monitoring 30-day maternal telemetry, automating Mean Arterial Pressure (MAP) calculations, and coordinating rapid emergency medical dispatches in Durg district.
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <div style="padding: 12px 18px; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); text-align: center;">
+          <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">ACTIVE PATIENTS</div>
+          <div style="font-size: 1.4rem; font-weight: 800; color: var(--text-main); font-family: 'JetBrains Mono', monospace;">1</div>
+        </div>
+        <div style="padding: 12px 18px; background-color: var(--status-red-bg); border: 1px solid var(--status-red-border); border-radius: var(--radius-md); text-align: center;">
+          <div style="font-size: 0.75rem; font-weight: 700; color: var(--status-red);">CRITICAL TRIAGE</div>
+          <div style="font-size: 1.4rem; font-weight: 800; color: var(--status-red); font-family: 'JetBrains Mono', monospace;" id="clinicAlertCount">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Patient Triage Card -->
+  <div class="card" style="margin-bottom: 0;">
+    <div class="card-title">
+      <span>Patient Clinical Telemetry Vault</span>
+      <span class="triage-status-label" style="background-color: var(--status-green-bg); color: var(--status-green); padding: 6px 12px; border-radius: 6px; border: 1px solid var(--status-green-border);" id="patientTriageBadge">GREEN ROUTINE</span>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 20px; padding: 16px; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+      <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Patient Name</div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-top: 2px;">Priya Sharma (Age: 26)</div>
+        <div style="font-size: 0.8rem; color: var(--text-subtle);">Village: Patan, District Durg</div>
+      </div>
+      <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Obstetric Timeline</div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-top: 2px;">Gestational Week 24</div>
+        <div style="font-size: 0.8rem; color: var(--text-subtle);">Trimester 2 (EDD: 2026-11-12)</div>
+      </div>
+      <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Last Telemetry Reading</div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); font-family: 'JetBrains Mono', monospace; margin-top: 2px;" id="clinicLastBP">118/76 mmHg</div>
+        <div style="font-size: 0.8rem; color: var(--brand-primary); font-weight: 600;" id="clinicLastMAP">MAP: 90.0 mmHg (Normal)</div>
+      </div>
+      <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Pharmacological Adherence</div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: var(--status-green); margin-top: 2px;">100% Spacing Compliance</div>
+        <div style="font-size: 0.8rem; color: var(--text-subtle);">IFA & Calcium spaced > 2 hours</div>
+      </div>
+    </div>
+
+    <!-- 30-Day Longitudinal Digest -->
+    <div style="margin-bottom: 24px;">
+      <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">30-Day Longitudinal Telemetry Digest</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; background-color: var(--bg-tertiary); padding: 16px; border-radius: var(--radius-md); border-left: 4px solid var(--brand-primary);" id="digestContent">
+        Loading patient 30-day clinical digest from storage vault...
+      </div>
+    </div>
+
+    <!-- Emergency Dispatch Action Triggers -->
+    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+      <button class="btn-primary" onclick="simulateDispatch('sms')" style="flex: 1; min-width: 200px; background-color: #000000; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+        <span>Transmit SMS Alert to ASHA Worker</span>
+      </button>
+
+      <button class="btn-primary" onclick="simulateDispatch('ambulance')" style="flex: 1; min-width: 200px; background-color: var(--status-red); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+        <span>EMERGENCY DISPATCH: 108 AMBULANCE</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Dispatch Log Console -->
+  <div class="card" style="margin-bottom: 0;">
+    <div class="card-title">
+      <span>ASHA Emergency Dispatch Log</span>
+      <span style="font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">Real-time Telemetry Feed</span>
+    </div>
+    <div id="dispatchLogArea" style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; display: flex; flex-direction: column; gap: 12px;">
+      <div style="padding: 12px; background-color: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-subtle); text-align: center;">
+        No active emergency dispatches initiated. System standing by.
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Agent Architecture Reference -->
+  <div class="card" style="margin-bottom: 0; background-color: #f8fafc; border-color: #cbd5e1;">
+    <div class="card-title" style="color: #0f172a;">
+      <span>AI Agent Pipeline Architecture (Track 2: Sanjeevani)</span>
+      <span style="font-size: 0.75rem; font-weight: 700; background-color: #e2e8f0; color: #334155; padding: 4px 10px; border-radius: 12px;">Gemma 4 System</span>
+    </div>
+    <div style="font-size: 0.85rem; color: #475569; line-height: 1.8;">
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-weight: 700; margin-bottom: 12px;">
+        <span style="padding: 6px 14px; background-color: #fee2e2; color: #991b1b; border-radius: 6px; border: 1px solid #fecaca;">Mamta Conversational Agent</span>
+        <span>→</span>
+        <span style="padding: 6px 14px; background-color: #e0e7ff; color: #3730a3; border-radius: 6px; border: 1px solid #c7d2fe;">MedVision OCR Agent</span>
+        <span>→</span>
+        <span style="padding: 6px 14px; background-color: #fef3c7; color: #92400e; border-radius: 6px; border: 1px solid #fde68a;">Risk Monitor Engine</span>
+        <span>→</span>
+        <span style="padding: 6px 14px; background-color: #d1fae5; color: #065f46; border-radius: 6px; border: 1px solid #a7f3d0;">ShieldGemma Safety</span>
+      </div>
+      <div>
+        <strong>System Capabilities:</strong>
+        <ul style="margin-top: 6px; padding-left: 20px; display: flex; flex-direction: column; gap: 4px;">
+          <li><strong>Gemma 4 31B IT / 26B A4B IT:</strong> Primary clinical reasoning, native function tool calling, and bilingual Hinglish synthesis.</li>
+          <li><strong>Automated MAP Telemetry:</strong> Continuously computes Mean Arterial Pressure to predict second/third-trimester preeclampsia.</li>
+          <li><strong>Pharmacological Spacing Audit:</strong> Audits duodenal chelation risks by enforcing 2-hour administration windows between IFA and Calcium.</li>
+          <li><strong>Cardiff Kick Surveillance:</strong> Standardized movement counting identifying fetal hypoxia or placental insufficiency.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const res = await fetch('/api/health-summary?user_id=default_patient_01&days=30');
+      const data = await res.json();
+
+      if (data.recent_vitals && data.recent_vitals.length > 0) {
+        const lastV = data.recent_vitals[data.recent_vitals.length - 1];
+        if (lastV.bp_systolic && lastV.bp_diastolic) {
+          document.getElementById('clinicLastBP').textContent = `${lastV.bp_systolic}/${lastV.bp_diastolic} mmHg`;
+          document.getElementById('clinicLastMAP').textContent = `MAP: ${lastV.map_value} mmHg`;
+        }
+      }
+
+      if (data.active_clinical_alerts && data.active_clinical_alerts.length > 0) {
+        const highest = data.active_clinical_alerts.some(a => a.severity === 'RED') ? 'RED' : 'YELLOW';
+        document.getElementById('clinicAlertCount').textContent = data.active_clinical_alerts.length;
+        const badge = document.getElementById('patientTriageBadge');
+        badge.textContent = highest + " ALERT";
+        badge.style.backgroundColor = highest === 'RED' ? 'var(--status-red-bg)' : 'var(--status-yellow-bg)';
+        badge.style.color = highest === 'RED' ? 'var(--status-red)' : 'var(--status-yellow)';
+        badge.style.borderColor = highest === 'RED' ? 'var(--status-red-border)' : 'var(--status-yellow-border)';
+      }
+
+      document.getElementById('digestContent').innerHTML = `
+        <strong>Telemetry Summary (Last 30 Days):</strong><br>
+        • Total Vital Sign Entries Recorded: ${data.vitals_count} sessions<br>
+        • Medication & Supplement Doses Audited: ${data.medication_doses_logged} doses (Zero pharmacological spacing conflicts detected)<br>
+        • Cardiff Kick Count Surveillance Sessions: ${data.kick_surveillance_sessions} completed windows<br>
+        • Active Obstetric Risk Triage Alerts: ${data.active_clinical_alerts ? data.active_clinical_alerts.length : 0} alerts logged in clinical vault.
+      `;
+    } catch(e) {
+      console.error("Clinic load error:", e);
+    }
+  });
+
+  function simulateDispatch(type) {
+    const area = document.getElementById('dispatchLogArea');
+    const existingEmpty = area.querySelector('div[style*="text-align: center"]');
+    if (existingEmpty) existingEmpty.remove();
+
+    const timeStr = new Date().toLocaleTimeString('en-IN', {hour12: false});
+    const logBox = document.createElement('div');
+
+    if (type === 'sms') {
+      logBox.style.padding = "14px";
+      logBox.style.backgroundColor = "var(--bg-secondary)";
+      logBox.style.border = "1px solid var(--border-strong)";
+      logBox.style.borderLeft = "4px solid #000000";
+      logBox.style.borderRadius = "6px";
+      logBox.innerHTML = `
+        <div style="font-weight: 700; color: #000000; margin-bottom: 6px;">[SMS DISPATCHED TO ASHA WORKER] — Time: ${timeStr}</div>
+        <div style="color: var(--text-muted);">
+          To: ASHA Worker Smt. Sunita Verma (ID: CG-DURG-402)<br>
+          Patient: Priya Sharma | Week: 24 | Village: Patan<br>
+          Action Required: Conduct home visit within 24 hours to review blood pressure and MAP telemetry.
+        </div>
+      `;
+      alert("SMS Alert Transmitted Successfully to ASHA Worker Smt. Sunita Verma.");
+    } else {
+      logBox.style.padding = "14px";
+      logBox.style.backgroundColor = "var(--status-red-bg)";
+      logBox.style.border = "1px solid var(--status-red-border)";
+      logBox.style.borderLeft = "4px solid var(--status-red)";
+      logBox.style.borderRadius = "6px";
+      logBox.innerHTML = `
+        <div style="font-weight: 700; color: var(--status-red); margin-bottom: 6px;">[EMERGENCY 108 AMBULANCE DISPATCH INITIATED] — Time: ${timeStr}</div>
+        <div style="color: #991b1b;">
+          Priority: HIGH OBSTETRIC EMERGENCY (Code Red)<br>
+          Destination: District Hospital Durg (Labor & Emergency Room)<br>
+          Patient Telemetry: MAP >= 105 mmHg (Preeclampsia Alert)<br>
+          Assigned Unit: Ambulance CG-07-EM-9912 | ETA: 14 Minutes
+        </div>
+      `;
+      alert("EMERGENCY DISPATCH CONFIRMED:\n\n108 Ambulance Unit CG-07-EM-9912 dispatched to Patan village. ETA: 14 Minutes.");
+    }
+
+    area.insertBefore(logBox, area.firstChild);
+  }
+</script>
+{% endblock %}

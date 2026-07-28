@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mamta - Your Digital Dai | AI for Rural Healthcare</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='css/favicon.png') }}">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <img src="{{ url_for('static', filename='css/horizontal_logo.png') }}" alt="Mamta Logo" onerror="this.src='{{ url_for('static', filename='css/logo.png') }}'">
+      </div>
+      <div class="nav-links">
+        <a href="#problem">The Problem</a>
+        <a href="#solution">Our Solution</a>
+        <a href="#tech">Technology</a>
+        <a href="#hospitals">For Hospitals</a>
+      </div>
+      <a href="/app" class="btn btn-primary">Launch Demo</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-bg-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+    <div class="hero-content">
+      <img src="{{ url_for('static', filename='css/transparent logo.png') }}" alt="Mamta Logo" class="hero-main-logo">
+      <h1 class="hero-title">Empowering Every Mother.<br><span class="text-gradient">Zero Cloud Dependency.</span></h1>
+      <p class="hero-subtitle">
+        An offline, privacy-first AI Digital 'Dai' (Midwife) bridging the gap in rural Indian maternal healthcare using state-of-the-art Gemma 4 models natively in your browser.
+      </p>
+      <div class="hero-actions">
+        <a href="/app" class="btn btn-large btn-gradient">Try the App Now</a>
+        <a href="#problem" class="btn btn-large btn-outline">Learn More</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- The Problem Section -->
+  <section id="problem" class="section bg-light">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2 class="section-title">The Hidden Crisis in Rural India</h2>
+        <div class="divider"></div>
+      </div>
+      <div class="grid grid-2">
+        <div class="problem-text">
+          <p class="lead">India accounts for nearly <strong>one-fifth of all global maternal deaths</strong>, with rural and underprivileged communities bearing the largest burden.</p>
+          <ul class="feature-list">
+            <li><strong>Lack of Access:</strong> Millions of pregnant women live far from primary health centers.</li>
+            <li><strong>The "Dai" Shortage:</strong> Traditional midwives (Dais) are culturally crucial but increasingly unaffordable or unavailable for continuous care.</li>
+            <li><strong>Nutritional Deficiencies:</strong> Anemia and malnutrition during pregnancy lead directly to high mortality rates.</li>
+            <li><strong>Digital Divide:</strong> Most existing health apps require high-speed internet, which fails in remote villages.</li>
+          </ul>
+        </div>
+        <div class="problem-stats">
+          <div class="stat-card">
+            <div class="stat-number">~113</div>
+            <div class="stat-label">Maternal Deaths per 100,000 live births</div>
+          </div>
+          <div class="stat-card stat-accent">
+            <div class="stat-number">Zero</div>
+            <div class="stat-label">Internet required for Mamta's core AI</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The Solution Section -->
+  <section id="solution" class="section">
+    <div class="container">
+      <div class="section-header text-center">
+        <h2 class="section-title">Mamta: The AI Digital Dai</h2>
+        <div class="divider"></div>
+        <p class="section-subtitle">We bring the expertise of a midwife directly to a mother's smartphone, bridging the gap between clinical visits.</p>
+      </div>
+      
+      <div class="grid grid-3">
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>Local AI Intelligence</h3>
+          <p>Powered by a fine-tuned Google Gemma 4 model, Mamta provides medically aligned advice natively on the device. No cloud delays, absolute privacy.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🗣️</div>
+          <h3>Voice & Vernacular</h3>
+          <p>Designed for inclusivity. Voice-first interface speaking in comforting, natural Hindi to overcome literacy barriers in rural areas.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📸</div>
+          <h3>Vision Nutrition Tracker</h3>
+          <p>Mothers can snap a picture of their meal. Our offline MobileNet vision model analyzes the food and Gemma suggests missing vital pregnancy nutrients.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack Section -->
+  <section id="tech" class="section bg-dark text-white">
+    <div class="container text-center">
+      <h2 class="section-title">Built with Cutting-Edge Tech</h2>
+      <div class="divider divider-light"></div>
+      <p class="tech-subtitle">Mamta is a seamless Mobile + Web App engineered for the most constrained environments.</p>
+      
+      <div class="tech-grid">
+        <div class="tech-item">
+          <h4>Google Gemma 4</h4>
+          <p>Fine-tuned LLM running via WebGPU directly in the browser.</p>
+        </div>
+        <div class="tech-item">
+          <h4>TensorFlow.js</h4>
+          <p>Offline computer vision for instant dietary analysis.</p>
+        </div>
+        <div class="tech-item">
+          <h4>Neural TTS</h4>
+          <p>Offline Speech Synthesis for a comforting, human-like Voice Engine.</p>
+        </div>
+        <div class="tech-item">
+          <h4>PWA Architecture</h4>
+          <p>Installable as a native app on mobile, caching everything offline.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- B2B / Hospitals Section -->
+  <section id="hospitals" class="section">
+    <div class="container">
+      <div class="hospital-banner glassmorphism">
+        <div class="hospital-content">
+          <h2>Transforming Clinical Care</h2>
+          <p><strong>For Doctors, Hospitals, and Clinics:</strong><br>
+          Mamta doesn't replace doctors; it extends their reach. Hospitals can onboard high-risk patients onto Mamta. The app acts as an continuous monitoring agent, answering the mother's daily anxious queries and tracking her nutrition seamlessly.</p>
+          <p>Doctors can directly access weekly summaries of the mother's symptoms, dietary habits, and vitals via a centralized dashboard without requiring her to travel miles for daily monitorings. Early intervention saves lives.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer CTA -->
+  <footer class="footer">
+    <div class="container text-center">
+      <h2>Experience the Future of Maternal Care</h2>
+      <p>Try the offline Gemma-powered Digital Dai directly in your browser.</p>
+      <a href="/app" class="btn btn-large btn-gradient mt-4">Launch Mamta Demo</a>
+      
+      <div class="footer-copyright">
+        <p>&copy; 2026 Mamta Healthcare. Built for the Hackathon.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

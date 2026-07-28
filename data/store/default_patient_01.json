@@ -1,0 +1,235 @@
+{
+  "user_id": "default_patient_01",
+  "created_at": "2026-07-27T18:29:25.238578",
+  "profile": {
+    "name": "Priya Sharma",
+    "age": 26,
+    "lmp_date": "2026-02-09",
+    "edd": "2026-11-16",
+    "current_week": 24,
+    "blood_group": "B Positive",
+    "language": "hinglish",
+    "high_risk_flag": false,
+    "clinical_risk_factors": []
+  },
+  "vital_signs_log": [
+    {
+      "id": "v1",
+      "timestamp": "2026-07-22T18:29:25.238578",
+      "date": "2026-07-22",
+      "bp_systolic": 118,
+      "bp_diastolic": 76,
+      "map_value": 90.0,
+      "weight_kg": 60.5
+    },
+    {
+      "id": "v2",
+      "timestamp": "2026-07-23T18:29:25.238578",
+      "date": "2026-07-23",
+      "bp_systolic": 120,
+      "bp_diastolic": 78,
+      "map_value": 92.0,
+      "weight_kg": 60.7
+    },
+    {
+      "id": "v3",
+      "timestamp": "2026-07-24T18:29:25.238578",
+      "date": "2026-07-24",
+      "bp_systolic": 119,
+      "bp_diastolic": 75,
+      "map_value": 89.6,
+      "weight_kg": 60.9
+    },
+    {
+      "id": "v4",
+      "timestamp": "2026-07-25T18:29:25.238578",
+      "date": "2026-07-25",
+      "bp_systolic": 122,
+      "bp_diastolic": 79,
+      "map_value": 93.3,
+      "weight_kg": 61.1
+    },
+    {
+      "id": "v5",
+      "timestamp": "2026-07-26T18:29:25.238578",
+      "date": "2026-07-26",
+      "bp_systolic": 121,
+      "bp_diastolic": 80,
+      "map_value": 93.6,
+      "weight_kg": 61.3
+    },
+    {
+      "id": "8b0215e3",
+      "timestamp": "2026-07-27T19:01:52.428504",
+      "date": "2026-07-27",
+      "bp_systolic": 138.0,
+      "bp_diastolic": 88.0,
+      "map_value": 104.7,
+      "weight_kg": 62.0,
+      "temperature_f": null,
+      "blood_glucose_mg_dl": null,
+      "hemoglobin_g_dl": null
+    }
+  ],
+  "medication_log": [
+    {
+      "id": "m1",
+      "medication": "Iron-Folic Acid (IFA)",
+      "dosage": "1 tablet",
+      "taken": true,
+      "timestamp": "2026-07-26T10:29:25.238578",
+      "date": "2026-07-26"
+    },
+    {
+      "id": "m2",
+      "medication": "Calcium Carbonate",
+      "dosage": "1 tablet",
+      "taken": true,
+      "timestamp": "2026-07-26T16:29:25.238578",
+      "date": "2026-07-26"
+    },
+    {
+      "id": "50b6720e",
+      "medication": "Iron-Folic Acid (IFA)",
+      "dosage": "1 tablet",
+      "taken": true,
+      "timestamp": "2026-07-27T19:02:38.265506",
+      "date": "2026-07-27"
+    },
+    {
+      "id": "febee95a",
+      "medication": "Iron-Folic Acid (IFA)",
+      "dosage": "1 tablet",
+      "taken": true,
+      "timestamp": "2026-07-27T19:02:40.577214",
+      "date": "2026-07-27"
+    }
+  ],
+  "kick_count_log": [
+    {
+      "id": "k1",
+      "timestamp": "2026-07-24T18:29:25.238578",
+      "date": "2026-07-24",
+      "movement_count": 12,
+      "duration_minutes": 60,
+      "velocity_normal": true
+    },
+    {
+      "id": "k2",
+      "timestamp": "2026-07-25T18:29:25.238578",
+      "date": "2026-07-25",
+      "movement_count": 14,
+      "duration_minutes": 60,
+      "velocity_normal": true
+    },
+    {
+      "id": "k3",
+      "timestamp": "2026-07-26T18:29:25.238578",
+      "date": "2026-07-26",
+      "movement_count": 11,
+      "duration_minutes": 60,
+      "velocity_normal": true
+    },
+    {
+      "id": "55660325",
+      "timestamp": "2026-07-27T19:07:35.627936",
+      "date": "2026-07-27",
+      "movement_count": 12,
+      "duration_minutes": 60,
+      "velocity_normal": true
+    }
+  ],
+  "symptom_triage_log": [],
+  "conversation_history": [
+    {
+      "role": "user",
+      "content": "Log blood pressure reading 138/88 mmHg and weight 62 kg",
+      "timestamp": "2026-07-27T19:01:49.614809"
+    },
+    {
+      "role": "model",
+      "content": "Clinical Telemetry Logged:\n\nBlood Pressure: 138.0/88.0 mmHg\nComputed Mean Arterial Pressure (MAP): 104.7 mmHg (ELEVATED WARNING)\n\nClinical Rationale: Your MAP reading has been recorded in the longitudinal vault. Maintaining a MAP below 105 mmHg is essential for preventing placental perfusion resistance. Please continue left-lateral resting and monitor for visual disturbances or headaches.",
+      "timestamp": "2026-07-27T19:01:52.442366"
+    },
+    {
+      "role": "user",
+      "content": "I took my Iron-Folic Acid tablet just now",
+      "timestamp": "2026-07-27T19:02:36.232861"
+    },
+    {
+      "role": "user",
+      "content": "I took my Iron-Folic Acid tablet just now",
+      "timestamp": "2026-07-27T19:02:38.172837"
+    },
+    {
+      "role": "model",
+      "content": "Medication Adherence Verified:\n\nSuccessfully logged Iron-Folic Acid (IFA) in your pharmacological tracking vault. No duodenal chelation conflicts detected.\n\nNutritional Advice: Take iron tablets with fresh lemon juice or amla water (Vitamin C) to increase intestinal absorption threefold.",
+      "timestamp": "2026-07-27T19:02:38.275035"
+    },
+    {
+      "role": "model",
+      "content": "Medication Adherence Verified:\n\nSuccessfully logged Iron-Folic Acid (IFA) in your pharmacological tracking vault. No duodenal chelation conflicts detected.\n\nNutritional Advice: Take iron tablets with fresh lemon juice or amla water (Vitamin C) to increase intestinal absorption threefold.",
+      "timestamp": "2026-07-27T19:02:40.589812"
+    },
+    {
+      "role": "user",
+      "content": "hi",
+      "timestamp": "2026-07-27T19:05:39.573091"
+    },
+    {
+      "role": "model",
+      "content": "Namaste Priya ji. I am Mamta, your digital maternal companion and clinical triage system (Gestational Week 24).\n\nI am recording all your maternal health parameters in our secure clinical vault. You can use the quick action buttons above to log vital readings, verify supplement spacing intervals, or record Cardiff kick counts. How may I assist your obstetric care today?",
+      "timestamp": "2026-07-27T19:05:42.401921"
+    },
+    {
+      "role": "user",
+      "content": "Recorded 12 fetal kicks in the last 45 minutes",
+      "timestamp": "2026-07-27T19:07:33.047395"
+    },
+    {
+      "role": "model",
+      "content": "Cardiff Fetal Surveillance Logged:\n\nRecorded 12 distinct fetal movements. This meets the Cardiff Count-to-Ten clinical threshold (minimum 10 movements per 120-minute active window).\n\nYour baby's motor activity indicates satisfactory placental oxygenation. Continue daily evening surveillance.",
+      "timestamp": "2026-07-27T19:07:35.642200"
+    },
+    {
+      "role": "user",
+      "content": "mera pet dard ho rha hai aur blood leak hai",
+      "timestamp": "2026-07-27T19:11:30.427496"
+    },
+    {
+      "role": "model",
+      "content": "Namaste Priya ji. I am Mamta, your digital maternal companion and clinical triage system (Gestational Week 24).\n\nI am recording all your maternal health parameters in our secure clinical vault. You can use the quick action buttons above to log vital readings, verify supplement spacing intervals, or record Cardiff kick counts. How may I assist your obstetric care today?",
+      "timestamp": "2026-07-27T19:11:32.975463"
+    },
+    {
+      "role": "user",
+      "content": "hi",
+      "timestamp": "2026-07-27T19:11:54.486774"
+    },
+    {
+      "role": "model",
+      "content": "Namaste Priya ji. I am Mamta, your digital maternal companion and clinical triage system (Gestational Week 24).\n\nI am recording all your maternal health parameters in our secure clinical vault. You can use the quick action buttons above to log vital readings, verify supplement spacing intervals, or record Cardiff kick counts. How may I assist your obstetric care today?",
+      "timestamp": "2026-07-27T19:11:56.741756"
+    },
+    {
+      "role": "user",
+      "content": "choot me dard hai",
+      "timestamp": "2026-07-27T19:18:40.384736"
+    },
+    {
+      "role": "model",
+      "content": "Namaste Priya ji. I am Mamta, your digital maternal companion and clinical triage system (Gestational Week 24).\n\nI am recording all your maternal health parameters in our secure clinical vault. You can use the quick action buttons above to log vital readings, verify supplement spacing intervals, or record Cardiff kick counts. How may I assist your obstetric care today?",
+      "timestamp": "2026-07-27T19:18:41.479633"
+    }
+  ],
+  "clinical_alerts": [
+    {
+      "id": "882a3043",
+      "severity": "YELLOW",
+      "category": "Elevated Arterial Pressure",
+      "message": "Elevated BP 138.0/88.0 mmHg (MAP: 104.7 mmHg). Recommend 24-hour surveillance and rest in left lateral position.",
+      "timestamp": "2026-07-27T19:01:52.428656"
+    }
+  ],
+  "diagnostic_vault": []
+}

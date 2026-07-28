@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block title %}Mamta - AI Health Companion{% endblock %}
+{% block header_title %}Talk to Mamta{% endblock %}
+
+{% block content %}
+<div class="chat-workspace">
+  <!-- Quick Clinical Action Triggers Grid -->
+  <div class="quick-triggers-grid">
+    <div class="trigger-box" onclick="quickAction('Log blood pressure reading 138/88 mmHg and weight 62 kg')" style="text-align: center; padding: 20px;">
+      <div style="font-size: 2rem; margin-bottom: 8px;">📝</div>
+      <span class="trigger-label" style="font-size: 1rem;">Daily Health Check</span>
+      <span class="trigger-sub" style="display: block; margin-top: 4px;">Log Blood Pressure & Weight</span>
+    </div>
+    <div class="trigger-box" onclick="quickAction('I took my Iron-Folic Acid tablet just now')" style="text-align: center; padding: 20px;">
+      <div style="font-size: 2rem; margin-bottom: 8px;">💊</div>
+      <span class="trigger-label" style="font-size: 1rem;">Take Medicine</span>
+      <span class="trigger-sub" style="display: block; margin-top: 4px;">Log Iron/Calcium Pills</span>
+    </div>
+    <div class="trigger-box" onclick="quickAction('Recorded 12 fetal kicks in the last 45 minutes')" style="text-align: center; padding: 20px;">
+      <div style="font-size: 2rem; margin-bottom: 8px;">👶</div>
+      <span class="trigger-label" style="font-size: 1rem;">Baby Kicks</span>
+      <span class="trigger-sub" style="display: block; margin-top: 4px;">Count Baby's Movements</span>
+    </div>
+    <div class="trigger-box" onclick="document.getElementById('fileInput').click()" style="text-align: center; padding: 20px; border-color: var(--brand-primary); background-color: var(--bg-tertiary);">
+      <div style="font-size: 2rem; margin-bottom: 8px;">📸</div>
+      <span class="trigger-label" style="font-size: 1rem; color: var(--brand-primary);">Upload Report</span>
+      <span class="trigger-sub" style="display: block; margin-top: 4px;"><strong>Analyze with Gemma 4</strong></span>
+    </div>
+  </div>
+
+  <!-- Medical Chat Console Area -->
+  <div class="card" style="flex: 1; display: flex; flex-direction: column; padding: 0; overflow: hidden; margin-bottom: 0;">
+    <div style="padding: 16px 24px; background-color: var(--bg-tertiary); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+      <div style="font-size: 0.85rem; font-weight: 700; color: var(--brand-primary); text-transform: uppercase;">
+        Powered by Google Gemma 4 AI
+      </div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);">
+        Connected to Your Health Profile
+      </div>
+    </div>
+
+    <!-- Conversation Feed -->
+    <div class="chat-history-container" id="chatBox">
+      <!-- Welcome message -->
+      <div class="msg-row model">
+        <span class="msg-meta">Mamta (Health Companion)</span>
+        <div class="msg-bubble">Namaste Priya ji. I am Mamta, your health companion powered by Gemma 4.
+
+I am here to help you during your pregnancy. You can speak with me in Hindi or English. Use the buttons above to record your health, medicines, or baby's kicks. If you have a doctor's report or prescription, click "Upload Report" and Gemma 4 will read it for you.
+
+How are you feeling today?</div>
+      </div>
+    </div>
+
+    <!-- Image Preview Bar (Hidden by default) -->
+    <div id="imagePreviewBar" style="display: none; padding: 10px 24px; background-color: var(--bg-tertiary); border-top: 1px solid var(--border-color); align-items: center; justify-content: space-between;">
+      <span style="font-size: 0.82rem; font-weight: 600; color: var(--brand-primary);">Gemma 4 is ready to read your image</span>
+      <button onclick="clearImage()" style="background: none; border: none; color: var(--status-red); font-weight: 700; cursor: pointer;">Remove Image</button>
+    </div>
+
+    <!-- Input Bar -->
+    <div class="chat-input-panel">
+      <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
+      
+      <button class="btn-icon-action" onclick="document.getElementById('fileInput').click()" title="Attach Photo or Document">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+      </button>
+
+      <button class="btn-icon-action" id="voiceBtn" onclick="toggleVoice()" title="Speak to Mamta">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+      </button>
+
+      <textarea class="chat-text-area" id="chatInput" placeholder="Type here or use the voice button to speak..." onkeydown="if(event.key === 'Enter' && !event.shiftKey){ event.preventDefault(); sendMessage(); }"></textarea>
+
+      <button class="btn-primary" onclick="sendMessage()" style="padding: 14px 28px;">
+        <span>Send</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  let selectedImageBase64 = null;
+  let recognition = null;
+  let isRecording = false;
+
+  // Initialize Web Speech API for Hindi/English
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-IN'; // defaults to IN English/Hindi recognizer
+
+    recognition.onresult = function(event) {
+      const transcript = event.results[0][0].transcript;
+      document.getElementById('chatInput').value += " " + transcript;
+      stopVoice();
+    };
+    recognition.onerror = function(event) {
+      console.error("Speech recognition error:", event.error);
+      stopVoice();
+    };
+    recognition.onend = function() {
+      stopVoice();
+    };
+  }
+
+  function toggleVoice() {
+    if (!recognition) {
+      alert("Voice input is not supported in this browser. Please use Google Chrome or Microsoft Edge.");
+      return;
+    }
+    if (isRecording) {
+      recognition.stop();
+      stopVoice();
+    } else {
+      isRecording = true;
+      const btn = document.getElementById('voiceBtn');
+      btn.classList.add('recording');
+      btn.title = "Listening... Click to stop";
+      recognition.start();
+    }
+  }
+
+  function stopVoice() {
+    isRecording = false;
+    const btn = document.getElementById('voiceBtn');
+    if (btn) {
+      btn.classList.remove('recording');
+      btn.title = "Speak to Mamta";
+    }
+  }
+
+  function handleImageSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      selectedImageBase64 = e.target.result;
+      document.getElementById('imagePreviewBar').style.display = 'flex';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearImage() {
+    selectedImageBase64 = null;
+    document.getElementById('fileInput').value = "";
+    document.getElementById('imagePreviewBar').style.display = 'none';
+  }
+
+  function quickAction(text) {
+    document.getElementById('chatInput').value = text;
+    sendMessage();
+  }
+
+  function appendMessage(role, text, metaLabel, toolsUsed = null) {
+    const box = document.getElementById('chatBox');
+    const row = document.createElement('div');
+    row.className = "msg-row " + role;
+
+    const meta = document.createElement('span');
+    meta.className = "msg-meta";
+    meta.textContent = metaLabel;
+    row.appendChild(meta);
+
+    const bubble = document.createElement('div');
+    bubble.className = "msg-bubble";
+    bubble.textContent = text;
+
+    if (toolsUsed && toolsUsed.length > 0) {
+      const badgeContainer = document.createElement('div');
+      badgeContainer.style.marginTop = "10px";
+      toolsUsed.forEach(t => {
+        const badge = document.createElement('div');
+        badge.className = "tool-badge-box";
+        badge.innerHTML = "<span>Recorded in Health Profile</span>";
+        badgeContainer.appendChild(badge);
+      });
+      bubble.appendChild(badgeContainer);
+    }
+
+    row.appendChild(bubble);
+    box.appendChild(row);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text && !selectedImageBase64) return;
+
+    appendMessage("user", text || "[Image Shared]", "You");
+    input.value = "";
+    const imgData = selectedImageBase64;
+    clearImage();
+
+    // Show temporary typing status
+    const box = document.getElementById('chatBox');
+    const loadingRow = document.createElement('div');
+    loadingRow.className = "msg-row model";
+    loadingRow.id = "loadingRow";
+    loadingRow.innerHTML = '<span class="msg-meta">Mamta</span><div class="msg-bubble" style="color:var(--text-subtle);">Gemma 4 is thinking...</div>';
+    box.appendChild(loadingRow);
+    box.scrollTop = box.scrollHeight;
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: "default_patient_01",
+          message: text,
+          image: imgData
+        })
+      });
+      const data = await res.json();
+      const loader = document.getElementById('loadingRow');
+      if (loader) loader.remove();
+
+      appendMessage("model", data.reply || "Done.", "Mamta", data.tools_used);
+
+      // Trigger telemetry refresh if tools were used
+      if (data.tools_used && data.tools_used.length > 0) {
+        window.dispatchEvent(new Event('telemetryUpdate'));
+      }
+    } catch (e) {
+      const loader = document.getElementById('loadingRow');
+      if (loader) loader.remove();
+      appendMessage("model", "Network error. Please try again.", "System Error");
+    }
+  }
+</script>
+{% endblock %}

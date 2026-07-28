@@ -1,0 +1,38 @@
+{
+  "user_id": "test_user",
+  "created_at": "2026-07-27T18:04:35.436116",
+  "profile": {
+    "name": "Patient",
+    "age": 26,
+    "lmp_date": "2026-02-09",
+    "edd": "2026-11-16",
+    "current_week": 24,
+    "blood_group": "B Positive",
+    "language": "hinglish",
+    "high_risk_flag": false,
+    "clinical_risk_factors": []
+  },
+  "vital_signs_log": [],
+  "medication_log": [],
+  "kick_count_log": [],
+  "symptom_triage_log": [],
+  "conversation_history": [
+    {
+      "role": "user",
+      "content": "I have mild ankle swelling after walking. What should I do?",
+      "timestamp": "2026-07-27T18:04:35.441863"
+    },
+    {
+      "role": "user",
+      "content": "I have mild ankle swelling after walking. What should I do?",
+      "timestamp": "2026-07-27T18:05:40.189054"
+    },
+    {
+      "role": "model",
+      "content": "Obstetric Symptom Triage Assessment (YELLOW WARNING):\n\nReported Symptom: I have mild ankle swelling after walking. What should I do?\n\nClinical Evaluation: Mild dependent ankle edema after standing or walking is a physiological adaptation in Trimester 2/3 caused by uterine venous compression. However, if swelling is accompanied by facial edema, severe headaches, or visual blurring, it indicates potential preeclampsia.\n\nRecommended Action Plan:\n• Elevate lower extremities while resting and rest in left-lateral recumbent position.\n• Monitor blood pressure and Mean Arterial Pressure (MAP).\n• If severe headache or BP >= 140/90 occurs, contact your ASHA worker or call 108 Ambulance immediately.",
+      "timestamp": "2026-07-27T18:05:42.861591"
+    }
+  ],
+  "clinical_alerts": [],
+  "diagnostic_vault": []
+}

@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="ममता - आपकी डिजिटल दाई। गर्भावस्था में आपकी देखभाल के लिए AI सहायक।">
+  <meta name="theme-color" content="#C0392B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>ममता — आपकी डिजिटल दाई</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='css/favicon.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='css/favicon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script>
+    window.onerror = function(msg, url, lineNo, columnNo, error) {
+      fetch('/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ msg, url, lineNo, error: error ? error.stack : '' })
+      }).catch(e => console.log('Log failed'));
+      return false;
+    };
+    window.addEventListener('unhandledrejection', function(event) {
+      fetch('/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ msg: 'Unhandled Promise Rejection: ' + event.reason })
+      }).catch(e => console.log('Log failed'));
+    });
+  </script>
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- LOADING SCREEN                                                 -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="screen loading-screen active" id="screen-loading">
+      <img src="{{ url_for('static', filename='css/transparent logo.png') }}" alt="Mamta" class="loading-logo">
+      <div class="loading-text" id="loadingText" data-hi="ममता तैयार हो रही है..." data-en="Mamta is getting ready...">ममता तैयार हो रही है...</div>
+      <div class="loading-subtitle" id="loadingSubtext" data-hi="आपकी डिजिटल दाई जल्द आएगी" data-en="Your digital Dai is arriving soon">आपकी डिजिटल दाई जल्द आएगी</div>
+      <div class="loading-progress">
+        <div class="loading-progress-bar" id="loadingBar"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- BOTTOM NAVIGATION (Becomes Side Nav on Desktop)                -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <nav class="bottom-nav" id="bottomNav" style="display:none;">
+      <button class="nav-tab active" data-screen="home" onclick="switchScreen('home')">
+        <svg class="nav-tab-icon" viewBox="0 0 24 24">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+          <line x1="12" y1="19" x2="12" y2="23"></line>
+          <line x1="8" y1="23" x2="16" y2="23"></line>
+        </svg>
+        <span class="nav-tab-label" data-hi="दाई से बात" data-en="Talk to Dai">दाई से बात</span>
+      </button>
+      <button class="nav-tab" data-screen="checklist" onclick="switchScreen('checklist')">
+        <svg class="nav-tab-icon" viewBox="0 0 24 24">
+          <path d="M9 11l3 3L22 4"></path>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+        <span class="nav-tab-label" data-hi="चेकलिस्ट" data-en="Checklist">चेकलिस्ट</span>
+      </button>
+      <button class="nav-tab" data-screen="food" onclick="switchScreen('food')">
+        <svg class="nav-tab-icon" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"></path>
+        </svg>
+        <span class="nav-tab-label" data-hi="पोषण" data-en="Nutrition">पोषण</span>
+      </button>
+      <button class="nav-tab" data-screen="report" onclick="switchScreen('report')">
+        <svg class="nav-tab-icon" viewBox="0 0 24 24">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+          <circle cx="12" cy="13" r="4"></circle>
+        </svg>
+        <span class="nav-tab-label" data-hi="रिपोर्ट" data-en="Reports">रिपोर्ट</span>
+      </button>
+      <button class="nav-tab" data-screen="emergency" onclick="switchScreen('emergency')">
+        <svg class="nav-tab-icon" viewBox="0 0 24 24">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path>
+        </svg>
+        <span class="nav-tab-label" data-hi="मदद" data-en="Help">मदद</span>
+      </button>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 1: HOME — TALK TO DAI                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="screen home-screen" id="screen-home">
+      <!-- Header -->
+      <div class="home-header">
+        <img src="{{ url_for('static', filename='css/logo.png') }}" alt="Mamta" class="home-logo">
+        <div class="header-actions">
+          <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">A/अ EN</button>
+          <div class="home-week-badge">
+            <span data-hi="हफ्ता" data-en="Week">हफ्ता</span>
+            <span class="week-num" id="weekBadge">24</span>
+            <div class="model-status fallback" id="modelStatus" onclick="showWebGpuPopup()">
+              <div class="model-status-dot"></div>
+              <span id="modelStatusText" data-hi="Gemma 4 निष्क्रिय" data-en="Gemma 4 Inactive">Gemma 4 निष्क्रिय</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Section (Logo + Greeting) -->
+      <div class="home-hero" id="homeHero">
+        <div class="hero-logo-container">
+          <img src="{{ url_for('static', filename='css/transparent logo.png') }}" alt="Mamta" class="hero-logo">
+        </div>
+        <div class="hero-greeting">
+          <h1 data-hi="दाई से बात करें" data-en="Talk to Dai">दाई से बात करें</h1>
+          <p id="heroGreeting">नमस्ते! मैं आपकी डिजिटल दाई हूं।</p>
+        </div>
+      </div>
+
+      <!-- Suggestion Chips -->
+      <div class="suggestions-container" id="suggestionsContainer">
+        <div class="suggestions-title" data-hi="दाई से ये पूछें:" data-en="Ask Dai:">दाई से ये पूछें:</div>
+        <div class="suggestions-scroll" id="suggestionsScroll">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+
+      <!-- Chat Messages -->
+      <div class="chat-area" id="chatArea">
+        <!-- Messages rendered here by JS -->
+      </div>
+
+      <!-- Talk Button -->
+      <div class="talk-area">
+        <button class="talk-btn" id="talkBtn" aria-label="दाई से बात करें">
+          <div class="talk-btn-ring"></div>
+          <svg class="talk-btn-icon" viewBox="0 0 24 24">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+          <span class="talk-btn-label" id="talkBtnLabel" data-hi="बात करें" data-en="Talk">बात करें</span>
+        </button>
+        <div class="talk-state-text" id="talkStateText"></div>
+        <div class="talk-hint" id="talkHint" data-hi="दबाकर रखें बोलने के लिए &bull; PC: Space bar" data-en="Hold to speak &bull; PC: Space bar">दबाकर रखें बोलने के लिए &bull; PC: Space bar</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 2: CHECKLIST                                            -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="screen checklist-screen" id="screen-checklist">
+      <div class="screen-header">
+        <h2 data-hi="मेरी चेकलिस्ट" data-en="My Checklist">मेरी चेकलिस्ट</h2>
+        <div class="home-week-badge">
+          <span data-hi="हफ्ता" data-en="Week">हफ्ता</span>
+          <span class="week-num" id="checklistWeek">24</span>
+        </div>
+      </div>
+
+      <div class="screen-content">
+        <!-- Trimester Selector -->
+        <div class="trimester-selector" id="trimesterSelector">
+          <button class="trimester-btn" data-trimester="1" onclick="selectTrimester(1)">
+            <span data-hi="पहला" data-en="First">पहला</span>
+            <span class="tri-label" data-hi="1-13 हफ्ते" data-en="Weeks 1-13">1-13 हफ्ते</span>
+          </button>
+          <button class="trimester-btn active" data-trimester="2" onclick="selectTrimester(2)">
+            <span data-hi="दूसरा" data-en="Second">दूसरा</span>
+            <span class="tri-label" data-hi="14-27 हफ्ते" data-en="Weeks 14-27">14-27 हफ्ते</span>
+          </button>
+          <button class="trimester-btn" data-trimester="3" onclick="selectTrimester(3)">
+            <span data-hi="तीसरा" data-en="Third">तीसरा</span>
+            <span class="tri-label" data-hi="28-40 हफ्ते" data-en="Weeks 28-40">28-40 हफ्ते</span>
+          </button>
+        </div>
+
+        <!-- Today's Progress Card -->
+        <div class="progress-card">
+          <div class="progress-title" data-hi="आज का प्रोग्रेस" data-en="Today's Progress">आज का प्रोग्रेस</div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progressFill" style="width: 0%"></div>
+          </div>
+          <div class="progress-stats">
+            <span id="progressText">0/0</span>
+            <span id="progressPercent">0%</span>
+          </div>
+        </div>
+
+        <!-- Today's Checklist -->
+        <div class="checklist-section-title" data-hi="आज के काम" data-en="Today's Tasks">आज के काम</div>
+        <div class="checklist-items" id="checklistItems">
+          <!-- Filled by JS -->
+        </div>
+
+        <!-- This Week's Info -->
+        <div class="week-info-card" id="weekInfoCard">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 3: FOOD & NUTRITION                                     -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="screen food-screen" id="screen-food">
+      <div class="screen-header">
+        <h2 data-hi="भोजन और पोषण" data-en="Food & Nutrition">भोजन और पोषण</h2>
+      </div>
+
+      <div class="screen-content">
+        <button class="food-camera-btn" onclick="document.getElementById('foodFileInput').click()">
+          <svg viewBox="0 0 24 24">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          <span data-hi="भोजन की फोटो खींचें" data-en="Take a picture of food">भोजन की फोटो खींचें</span>
+        </button>
+        <input type="file" id="foodFileInput" accept="image/*" capture="environment" style="display:none" onchange="handleFoodUpload(event)">
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;" data-hi="दाई आपको बताएगी कि इस भोजन में क्या मिलाना चाहिए" data-en="Dai will suggest healthy additions for your pregnancy">दाई आपको बताएगी कि इस भोजन में क्या मिलाना चाहिए</p>
+
+        <div class="food-analysis-card" id="foodAnalysisCard">
+          <img id="foodImagePreview" class="food-img-preview" alt="Food">
+          <div class="food-detected-label" id="foodDetectedLabel">...</div>
+          <div class="food-recommendation" id="foodRecommendation"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 4: REPORT UPLOAD                                        -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="screen report-screen" id="screen-report">
+      <div class="screen-header">
+        <h2 data-hi="रिपोर्ट दिखाएं" data-en="Show Reports">रिपोर्ट दिखाएं</h2>
+      </div>
+
+      <div class="screen-content">
+        <!-- Upload Area -->
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('reportFileInput').click()">
+          <svg class="upload-icon" viewBox="0 0 24 24">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          <div class="upload-title" data-hi="रिपोर्ट की फोटो खींचें" data-en="Take a photo of report">रिपोर्ट की फोटो खींचें</div>
+          <div class="upload-subtitle" data-hi="या गैलरी से चुनें — दाई समझाएगी" data-en="or choose from gallery — Dai will explain">या गैलरी से चुनें — दाई समझाएगी</div>
+        </div>
+        <input type="file" id="reportFileInput" accept="image/*" capture="environment" style="display:none" onchange="handleReportUpload(event)">
+
+        <!-- Report Preview & Analysis -->
+        <div class="report-preview" id="reportPreview">
+          <img id="reportImagePreview" class="report-image-preview" alt="Report">
+          <div class="report-analysis" id="reportAnalysis"></div>
+        </div>
+
+        <!-- Report History -->
+        <div class="report-history">
+          <div class="report-history-title" data-hi="पिछली रिपोर्ट्स" data-en="Past Reports">पिछली रिपोर्ट्स</div>
+          <div id="reportHistoryList">
+            <!-- Filled by JS -->
+          </div>
+          <div id="noReportsMsg" style="text-align:center; padding: 20px; color: var(--text-muted); font-size: 0.85rem;" data-hi="अभी तक कोई रिपोर्ट नहीं है" data-en="No reports yet">
+            अभी तक कोई रिपोर्ट नहीं है
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SCREEN 5: EMERGENCY (मदद)                                      -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="screen emergency-screen" id="screen-emergency">
+      <div class="screen-header">
+        <h2 data-hi="मदद चाहिए?" data-en="Need Help?">मदद चाहिए?</h2>
+      </div>
+
+      <div class="screen-content">
+        <!-- SOS Button -->
+        <div class="sos-button-area">
+          <button class="sos-btn" onclick="callEmergency()">
+            <svg class="sos-btn-icon" viewBox="0 0 24 24">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+            <span class="sos-btn-text">SOS</span>
+            <span class="sos-btn-sub">108</span>
+          </button>
+          <div class="sos-hint" data-hi="एम्बुलेंस बुलाने के लिए दबाएं (मुफ्त)" data-en="Press to call ambulance (Free)">एम्बुलेंस बुलाने के लिए दबाएं (मुफ्त)</div>
+        </div>
+
+        <!-- Emergency Contact Numbers -->
+        <div class="emergency-contacts">
+          <div class="emergency-section-title" data-hi="ज़रूरी नंबर" data-en="Important Numbers">ज़रूरी नंबर</div>
+          <div id="emergencyContactsList">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+
+        <!-- Danger Signs -->
+        <div class="danger-signs">
+          <div class="emergency-section-title" data-hi="ये लक्षण दिखें तो तुरंत मदद लें" data-en="Seek immediate help if you see these signs">ये लक्षण दिखें तो तुरंत मदद लें</div>
+          <div id="dangerSignsList">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- KICK COUNTER MODAL                                             -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="kick-modal" id="kickModal">
+      <div class="kick-modal-content">
+        <h3 style="font-family:'Poppins',sans-serif; font-size:1.1rem; color:var(--text-primary); margin-bottom:4px;" data-hi="बच्चे की किक गिनें" data-en="Count Baby Kicks">बच्चे की किक गिनें</h3>
+        <p style="font-size:0.82rem; color:var(--text-muted);" data-hi="हर किक पर बटन दबाएं" data-en="Tap the button on every kick">हर किक पर बटन दबाएं</p>
+        <div class="kick-counter-display" id="kickCountDisplay">0</div>
+        <button class="kick-tap-btn" id="kickTapBtn" onclick="recordKick()">👶</button>
+        <div class="kick-timer" id="kickTimer">00:00</div>
+        <div class="kick-modal-actions">
+          <button class="kick-modal-btn cancel" onclick="closeKickModal()" data-hi="रद्द करें" data-en="Cancel">रद्द करें</button>
+          <button class="kick-modal-btn save" onclick="saveKickCount()" data-hi="सहेजें" data-en="Save">सहेजें</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- WEBGPU POPUP                                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="webgpu-popup" id="webgpuPopup">
+      <div class="webgpu-popup-content">
+        <h3 class="webgpu-title" data-hi="AI काम क्यों नहीं कर रहा?" data-en="Why is AI not fully active?">AI काम क्यों नहीं कर रहा?</h3>
+        <p class="webgpu-text" id="webgpuExplanation" data-hi="स्मार्ट AI (Gemma 4) को आपके ब्राउज़र में 'WebGPU' की आवश्यकता है। अभी यह बंद है, इसलिए दाई 'Gemma 4 निष्क्रिय' मोड में काम कर रही है।" data-en="The smart AI (Gemma 4) requires 'WebGPU' in your browser. Since it's not active, Dai is working in 'Gemma 4 Inactive' mode.">स्मार्ट AI (Gemma 4) को आपके ब्राउज़र में 'WebGPU' की आवश्यकता है। अभी यह बंद है, इसलिए दाई 'Gemma 4 निष्क्रिय' मोड में काम कर रही है।</p>
+        <div class="webgpu-code">chrome://flags/#enable-unsafe-webgpu</div>
+        <p class="webgpu-text" style="font-size: 0.8rem;" data-hi="ऊपर दिए गए लिंक को कॉपी करें, नया टैब खोलें और इसे सक्षम करें।" data-en="Copy the link above, paste it in a new tab, and enable WebGPU.">ऊपर दिए गए लिंक को कॉपी करें, नया टैब खोलें और इसे सक्षम करें।</p>
+        <button class="kick-modal-btn save" style="width: 100%" onclick="document.getElementById('webgpuPopup').classList.remove('active')" data-hi="ठीक है" data-en="Got it">ठीक है</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <!-- SCRIPTS                                                          -->
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <script src="{{ url_for('static', filename='js/knowledge.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/data-store.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/voice.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/food-tracker.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/gemma-engine.js') }}"></script>
+
+  <script>
+    // ── App State ──────────────────────────────────────────────────────
+    let currentScreen = 'loading';
+    let conversationStarted = false;
+    let kickCount = 0;
+    let kickTimerInterval = null;
+    let kickStartTime = null;
+
+    // ── Localization ───────────────────────────────────────────────────
+    function toggleLanguage() {
+      const profile = MamtaStore.getProfile();
+      const currentLang = profile.language === 'en' ? 'en' : 'hi';
+      const newLang = currentLang === 'en' ? 'hi' : 'en';
+      
+      MamtaStore.updateProfile({ language: newLang });
+      document.getElementById('langToggle').textContent = newLang === 'en' ? 'A/अ HI' : 'A/अ EN';
+      
+      // Update all data attributes
+      document.querySelectorAll('[data-hi][data-en]').forEach(el => {
+        el.textContent = el.getAttribute(`data-${newLang}`);
+      });
+      
+      // Update dynamic content
+      updateGreeting();
+      fillSuggestions();
+      fillEmergencyContacts();
+      fillDangerSigns();
+      updateWeekInfo();
+      
+      // Update checklist if active
+      if(currentScreen === 'checklist') {
+        const trimester = MamtaKnowledge.getTrimester(MamtaStore.getCurrentWeek());
+        selectTrimester(trimester);
+      }
+    }
+
+    function isEn() {
+      return MamtaStore.getProfile().language === 'en';
+    }
+
+    // ── Initialization ─────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      initApp();
+    });
+
+    async function initApp() {
+      const profile = MamtaStore.getProfile();
+      // Set initial language toggle text
+      document.getElementById('langToggle').textContent = isEn() ? 'A/अ HI' : 'A/अ EN';
+      
+      // Translate statically bound text initially
+      if (isEn()) {
+        document.querySelectorAll('[data-hi][data-en]').forEach(el => {
+          el.textContent = el.getAttribute('data-en');
+        });
+      }
+
+      // Update user data displays
+      document.getElementById('weekBadge').textContent = profile.currentWeek;
+      document.getElementById('checklistWeek').textContent = profile.currentWeek;
+      updateGreeting();
+
+      // Fill data
+      fillSuggestions();
+      fillEmergencyContacts();
+      fillDangerSigns();
+      const trimester = MamtaKnowledge.getTrimester(profile.currentWeek);
+      selectTrimester(trimester);
+      updateWeekInfo();
+      updateReportHistory();
+
+      // Initialize voice system
+      const voiceSupported = MamtaVoice.init(handleVoiceResult, handleVoiceStateChange);
+      if (!voiceSupported) {
+        document.getElementById('talkHint').textContent = isEn() ? 'Voice not supported in this browser' : 'आपका browser voice support नहीं करता';
+      }
+      MamtaVoice.bindHoldToSpeak(document.getElementById('talkBtn'));
+      MamtaVoice.bindSpacebar();
+
+      // Initialize Food Tracker
+      FoodTracker.init();
+
+      // UI Transition
+      const loadingBar = document.getElementById('loadingBar');
+      loadingBar.style.width = '60%';
+
+      // Try loading Gemma model in background
+      updateModelStatus('fallback', isEn() ? 'Gemma 4 Loading...' : 'Gemma 4 लोड हो रहा है...');
+      DaiEngine.loadModel((progress, message) => {
+        loadingBar.style.width = progress + '%';
+        updateModelStatus('fallback', message || (isEn() ? `Gemma 4 (${progress}%)` : `Gemma 4 (${progress}%)`));
+      }).then(loaded => {
+        if (loaded) {
+          updateModelStatus('ready', isEn() ? 'Gemma 4 Active' : 'Gemma 4 सक्रिय');
+        } else {
+          updateModelStatus('fallback', isEn() ? 'Gemma 4 Inactive' : 'Gemma 4 निष्क्रिय');
+        }
+      });
+
+      // Transition to home after short delay
+      setTimeout(() => {
+        loadingBar.style.width = '100%';
+        setTimeout(() => {
+          document.getElementById('screen-loading').classList.remove('active');
+          document.getElementById('screen-home').classList.add('active');
+          document.getElementById('bottomNav').style.display = 'flex';
+          currentScreen = 'home';
+        }, 500);
+      }, 1500);
+    }
+
+    function updateGreeting() {
+      const profile = MamtaStore.getProfile();
+      const name = isEn() ? profile.name : (profile.nameHi || profile.name);
+      const msg = isEn() ? `Hello ${name}! I am your digital Dai.` : `नमस्ते ${name}! मैं आपकी डिजिटल दाई हूं।`;
+      document.getElementById('heroGreeting').textContent = msg;
+    }
+
+    // ── Screen Navigation ──────────────────────────────────────────────
+    function switchScreen(screenName) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+      const screenEl = document.getElementById('screen-' + screenName);
+      if (screenEl) screenEl.classList.add('active');
+
+      const tabEl = document.querySelector(`.nav-tab[data-screen="${screenName}"]`);
+      if (tabEl) tabEl.classList.add('active');
+
+      currentScreen = screenName;
+
+      if (screenName === 'checklist') {
+        const profile = MamtaStore.getProfile();
+        selectTrimester(MamtaKnowledge.getTrimester(profile.currentWeek));
+      } else if (screenName === 'report') {
+        updateReportHistory();
+      }
+    }
+
+    // ── Suggestions ────────────────────────────────────────────────────
+    function fillSuggestions() {
+      const container = document.getElementById('suggestionsScroll');
+      container.innerHTML = '';
+      MamtaKnowledge.SUGGESTIONS.forEach(s => {
+        const chip = document.createElement('button');
+        chip.className = 'suggestion-chip';
+        const text = isEn() ? s.text_en : s.text_hi;
+        chip.innerHTML = `<span class="chip-icon">${s.icon}</span>${text}`;
+        chip.onclick = () => handleSuggestionClick(text);
+        container.appendChild(chip);
+      });
+    }
+
+    function handleSuggestionClick(text) {
+      MamtaVoice.simulateInput(text);
+    }
+
+    // ── Voice Handling ─────────────────────────────────────────────────
+    function handleVoiceResult(text) {
+      addChatMessage('user', text);
+      minimizeHero();
+      showTypingIndicator();
+
+      DaiEngine.processQuery(text).then(result => {
+        removeTypingIndicator();
+        addChatMessage('dai', result.response, result.agentsUsed, result.severity);
+        MamtaVoice.speak(result.response);
+      }).catch(err => {
+        removeTypingIndicator();
+        const fallback = isEn() ? 'Sorry, something went wrong. Please try again.' : 'Didi, maaf kijiye, kuch gadbad ho gayi. Dobara koshish karein.';
+        addChatMessage('dai', fallback);
+        MamtaVoice.speak(fallback);
+      });
+    }
+
+    function handleVoiceStateChange(state) {
+      const btn = document.getElementById('talkBtn');
+      const label = document.getElementById('talkBtnLabel');
+      const stateText = document.getElementById('talkStateText');
+
+      btn.className = 'talk-btn';
+      if (state !== 'idle') btn.classList.add(state);
+
+      switch (state) {
+        case 'listening':
+          label.textContent = isEn() ? 'Listening' : 'सुन रही...';
+          stateText.textContent = isEn() ? 'Speak, Dai is listening...' : 'बोलिए, दाई सुन रही है...';
+          stateText.className = 'talk-state-text listening';
+          break;
+        case 'processing':
+          label.textContent = isEn() ? 'Thinking' : 'सोच रही...';
+          stateText.textContent = isEn() ? 'Dai is thinking...' : 'दाई सोच रही है...';
+          stateText.className = 'talk-state-text processing';
+          break;
+        case 'speaking':
+          label.textContent = isEn() ? 'Speaking' : 'बोल रही...';
+          stateText.textContent = isEn() ? 'Dai is speaking...' : 'दाई बोल रही है...';
+          stateText.className = 'talk-state-text speaking';
+          break;
+        default:
+          label.textContent = isEn() ? 'Talk' : 'बात करें';
+          stateText.textContent = '';
+          stateText.className = 'talk-state-text';
+      }
+    }
+
+    function addChatMessage(role, text, agents, severity) {
+      const chatArea = document.getElementById('chatArea');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `chat-message ${role}`;
+
+      const roleText = role === 'user' ? (isEn() ? 'You' : 'आप') : (isEn() ? 'Dai' : 'दाई');
+      let html = `<div class="msg-label">${roleText}</div>`;
+      html += `<div class="msg-content">${escapeHtml(text)}</div>`;
+
+      if (severity) {
+        const severityLabels = isEn() ? 
+          { RED: 'Danger', YELLOW: 'Warning', GREEN: 'Normal' } : 
+          { RED: 'खतरा', YELLOW: 'सावधान', GREEN: 'सब ठीक' };
+        html += `<div class="msg-severity ${severity}">${severityLabels[severity] || severity}</div>`;
+      }
+
+      if (agents && agents.length > 0) {
+        html += '<div class="msg-agents">';
+        agents.forEach(a => {
+          html += `<span class="agent-badge">${a}</span>`;
+        });
+        html += '</div>';
+      }
+
+      msgDiv.innerHTML = html;
+      chatArea.appendChild(msgDiv);
+      chatArea.scrollTop = chatArea.scrollHeight;
+      conversationStarted = true;
+    }
+
+    function showTypingIndicator() {
+      const chatArea = document.getElementById('chatArea');
+      const indicator = document.createElement('div');
+      indicator.className = 'chat-message dai';
+      indicator.id = 'typingIndicator';
+      indicator.innerHTML = `
+        <div class="msg-label">${isEn() ? 'Dai' : 'दाई'}</div>
+        <div class="msg-content">
+          <div class="typing-indicator">
+            <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+          </div>
+        </div>
+      `;
+      chatArea.appendChild(indicator);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+      const indicator = document.getElementById('typingIndicator');
+      if (indicator) indicator.remove();
+    }
+
+    function minimizeHero() {
+      document.getElementById('homeHero').classList.add('minimized');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ── Checklist ──────────────────────────────────────────────────────
+    function selectTrimester(num) {
+      document.querySelectorAll('.trimester-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.querySelector(`.trimester-btn[data-trimester="${num}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const checklist = MamtaKnowledge.getChecklist(num);
+      const progress = MamtaStore.getChecklistProgress();
+      const container = document.getElementById('checklistItems');
+      container.innerHTML = '';
+
+      checklist.forEach(item => {
+        const done = progress[item.id] || false;
+        const div = document.createElement('div');
+        div.className = `checklist-item${done ? ' done' : ''}`;
+        div.onclick = () => toggleChecklist(item.id, div);
+        const text = isEn() ? item.text_en : item.text_hi;
+        div.innerHTML = `
+          <div class="checklist-checkbox">
+            <svg class="checklist-checkbox-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <span class="checklist-icon">${item.icon}</span>
+          <span class="checklist-text">${text}</span>
+        `;
+        container.appendChild(div);
+      });
+      updateChecklistProgress();
+    }
+
+    function toggleChecklist(itemId, element) {
+      const nowDone = MamtaStore.toggleChecklistItem(itemId);
+      if (nowDone) element.classList.add('done');
+      else element.classList.remove('done');
+      updateChecklistProgress();
+    }
+
+    function updateChecklistProgress() {
+      const completion = MamtaStore.getChecklistCompletion();
+      document.getElementById('progressFill').style.width = completion.percent + '%';
+      const text = isEn() ? `${completion.done}/${completion.total} completed` : `${completion.done}/${completion.total} काम पूरे हुए`;
+      document.getElementById('progressText').textContent = text;
+      document.getElementById('progressPercent').textContent = completion.percent + '%';
+    }
+
+    function updateWeekInfo() {
+      const week = MamtaStore.getCurrentWeek();
+      const info = MamtaKnowledge.getWeekInfo(week);
+      const trimester = MamtaKnowledge.getTrimester(week);
+      const card = document.getElementById('weekInfoCard');
+
+      const title = isEn() ? `Week ${week} — Trimester ${trimester}` : `हफ्ता ${week} — Trimester ${trimester}`;
+      const babyText = isEn() ? info.baby_en : info.baby_hi;
+      const sizeLabel = isEn() ? 'Size' : 'आकार';
+      const focusText = isEn() ? info.focus_en : info.focus_hi;
+      const testText = isEn() ? info.tests_en || info.tests_hi : info.tests_hi; // Ensure tests_en exists in data
+
+      card.innerHTML = `
+        <div class="week-info-title">${title}</div>
+        <div class="week-info-item"><span class="week-info-icon">👶</span><span>${babyText}</span></div>
+        <div class="week-info-item"><span class="week-info-icon">📏</span><span>${sizeLabel}: ${info.size}</span></div>
+        <div class="week-info-item"><span class="week-info-icon">💡</span><span>${focusText}</span></div>
+        <div class="week-info-item"><span class="week-info-icon">🏥</span><span>${testText}</span></div>
+      `;
+    }
+
+    // ── Food Tracker ───────────────────────────────────────────────────
+    async function handleFoodUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!FoodTracker.isReady()) {
+        alert(isEn() ? "Food Vision AI is still loading, please wait a moment." : "फूड AI अभी लोड हो रहा है, कृपया प्रतीक्षा करें।");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const imageData = e.target.result;
+        const imgEl = document.getElementById('foodImagePreview');
+        imgEl.src = imageData;
+        document.getElementById('foodAnalysisCard').classList.add('active');
+        
+        const labelEl = document.getElementById('foodDetectedLabel');
+        const recEl = document.getElementById('foodRecommendation');
+        
+        labelEl.textContent = isEn() ? 'Analyzing...' : 'जांच हो रही है...';
+        recEl.textContent = '';
+
+        // Predict with MobileNet
+        try {
+          // Wait for image to load into DOM
+          await new Promise(r => imgEl.onload = r);
+          const detected = await FoodTracker.classifyImage(imgEl);
+          
+          labelEl.textContent = `👁️ ${isEn() ? detected.en : detected.hi}`;
+          recEl.textContent = isEn() ? 'Thinking about nutrition...' : 'पोषण के बारे में सोच रही है...';
+
+          // Pass to Gemma Engine for advice
+          const advice = await DaiEngine.processFoodImage(detected.en, detected.hi);
+          recEl.innerHTML = `<p>${escapeHtml(advice.response)}</p>`;
+          
+          // Add small agent badge
+          recEl.innerHTML += `<div class="msg-agents" style="margin-top:10px;">${advice.agentsUsed.map(a => `<span class="agent-badge">${a}</span>`).join('')}</div>`;
+          
+          MamtaVoice.speak(advice.response);
+        } catch (err) {
+          console.error(err);
+          labelEl.textContent = '❌ Error';
+          recEl.textContent = isEn() ? 'Could not analyze image.' : 'तस्वीर की जांच नहीं हो पाई।';
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ── Report Upload ──────────────────────────────────────────────────
+    function handleReportUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const imageData = e.target.result;
+        document.getElementById('reportImagePreview').src = imageData;
+        document.getElementById('reportPreview').classList.add('active');
+        document.getElementById('reportAnalysis').textContent = isEn() ? 'Dai is reading the report...' : 'दाई रिपोर्ट पढ़ रही है...';
+
+        const result = await DaiEngine.processReport(imageData);
+        document.getElementById('reportAnalysis').textContent = result.response;
+        MamtaVoice.speak(result.response);
+        updateReportHistory();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function updateReportHistory() {
+      const reports = MamtaStore.getReports();
+      const container = document.getElementById('reportHistoryList');
+      const noMsg = document.getElementById('noReportsMsg');
+
+      container.innerHTML = '';
+      if (reports.length === 0) {
+        noMsg.style.display = 'block';
+        return;
+      }
+      noMsg.style.display = 'none';
+
+      reports.reverse().forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'report-history-item';
+        div.innerHTML = `
+          <div class="report-history-icon">📄</div>
+          <div class="report-history-info">
+            <div class="report-history-date">${r.date}</div>
+            <div class="report-history-text">${(r.analysis || '').substring(0, 60)}...</div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // ── Emergency ──────────────────────────────────────────────────────
+    function fillEmergencyContacts() {
+      const container = document.getElementById('emergencyContactsList');
+      container.innerHTML = '';
+      MamtaKnowledge.EMERGENCY_CONTACTS.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'emergency-contact-card';
+        const name = isEn() ? c.name_en : c.name_hi;
+        const desc = isEn() ? (c.desc_en || '') : c.desc_hi;
+        div.innerHTML = `
+          <div class="emergency-contact-info">
+            <div class="emergency-contact-name">${name}</div>
+            <div class="emergency-contact-desc">${desc}</div>
+          </div>
+          <a href="tel:${c.number}" class="emergency-call-btn">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            ${c.number}
+          </a>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function fillDangerSigns() {
+      const container = document.getElementById('dangerSignsList');
+      container.innerHTML = '';
+      MamtaKnowledge.DANGER_SIGNS.forEach(s => {
+        const div = document.createElement('div');
+        div.className = `danger-sign-item ${s.severity}`;
+        const sign = isEn() ? s.sign_en : s.sign_hi;
+        div.innerHTML = `
+          <div class="danger-sign-dot"></div>
+          <span>${sign}</span>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function callEmergency() {
+      const msg = isEn() ? 'Do you want to call the 108 Ambulance?\n\nThis is a free service.' : 'क्या आप 108 एम्बुलेंस को कॉल करना चाहती हैं?\n\nयह मुफ्त सेवा है।';
+      if (confirm(msg)) {
+        window.location.href = 'tel:108';
+      }
+    }
+
+    // ── Kick Counter ───────────────────────────────────────────────────
+    function recordKick() {
+      kickCount++;
+      document.getElementById('kickCountDisplay').textContent = kickCount;
+      document.getElementById('kickTapBtn').style.transform = 'scale(0.85)';
+      setTimeout(() => document.getElementById('kickTapBtn').style.transform = 'scale(1)', 150);
+    }
+
+    function closeKickModal() {
+      if (kickTimerInterval) clearInterval(kickTimerInterval);
+      document.getElementById('kickModal').classList.remove('active');
+    }
+
+    function saveKickCount() {
+      if (kickTimerInterval) clearInterval(kickTimerInterval);
+      const elapsed = Math.floor((new Date() - kickStartTime) / 60000);
+      const entry = MamtaStore.addKickCount(kickCount, Math.max(1, elapsed));
+
+      let message;
+      if (entry.normal) {
+        message = isEn() ? `Great! ${kickCount} kicks in ${elapsed} minutes. Baby is fine!` : `बहुत अच्छा! ${kickCount} किक ${elapsed} मिनट में। बच्चा ठीक है!`;
+      } else {
+        message = isEn() ? `${kickCount} kicks in ${elapsed} mins — this is a bit low. Drink water, lie on your left side and recount. If still low, consult doctor.` : `${kickCount} किक ${elapsed} मिनट में — यह थोड़ा कम है। पानी पीकर बाईं करवट लेटें और दोबारा गिनें। अगर फिर भी कम हो तो डॉक्टर से मिलें।`;
+      }
+
+      document.getElementById('kickModal').classList.remove('active');
+      switchScreen('home');
+      addChatMessage('dai', message, ['Kick Counter Agent'], entry.normal ? 'GREEN' : 'YELLOW');
+      MamtaVoice.speak(message);
+    }
+
+    // ── Status & Popups ────────────────────────────────────────────────
+    function updateModelStatus(status, text) {
+      const el = document.getElementById('modelStatus');
+      const textEl = document.getElementById('modelStatusText');
+      el.className = 'model-status ' + status;
+      textEl.textContent = text;
+    }
+
+    function showWebGpuPopup() {
+      if (document.getElementById('modelStatus').classList.contains('fallback')) {
+        document.getElementById('webgpuPopup').classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Mamta - Maternal Companion{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Left Sidebar: Navigation & Patient Profile -->
+    <aside class="sidebar" id="appSidebar">
+      <div class="sidebar-header">
+        <a href="/" class="brand-logo-container">
+          <img src="{{ url_for('static', filename='css/transparent logo.png') }}" alt="Mamta Logo" class="brand-logo-img">
+        </a>
+      </div>
+
+      <!-- Patient Summary Card -->
+      <div class="patient-vault-card">
+        <div class="patient-vault-title">MY HEALTH PROFILE</div>
+        <div class="patient-vault-name" id="sidebarPatientName">Priya Sharma</div>
+        <div class="patient-vault-meta">
+          <div>Pregnancy Week: <strong id="sidebarWeek">24</strong></div>
+          <div>Blood Group: <strong>B Positive</strong></div>
+          <div>Due Date: <strong id="sidebarEdd">Nov 12, 2026</strong></div>
+        </div>
+        <div class="patient-vault-tag">Sanjeevani Health Plan</div>
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="nav-menu">
+        <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <span>Talk to Mamta (Chat)</span>
+        </a>
+        <a href="/dashboard" class="nav-item {% if request.path == '/dashboard' %}active{% endif %}">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+          <span>My Health Charts</span>
+        </a>
+        <a href="/clinic" class="nav-item {% if request.path == '/clinic' %}active{% endif %}">
+          <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"></path><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+          <span>Doctor / ASHA View</span>
+        </a>
+      </nav>
+
+      <div style="padding: 16px; font-size: 0.72rem; color: var(--text-subtle); border-top: 1px solid var(--border-color);">
+        Powered by Google<br>
+        <strong>Gemma 4 AI Assistant</strong>
+      </div>
+    </aside>
+
+    <!-- Center Panel: Main Workspace -->
+    <main class="main-workspace">
+      <header class="workspace-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <button class="mobile-nav-toggle" onclick="toggleSidebar()">
+            <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <div class="workspace-title">
+            {% block header_title %}Maternal Care Dashboard{% endblock %}
+            <span class="workspace-badge">GEMMA 4 ACTIVE</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn-primary" onclick="sendToDoctor()" style="background-color: #000000; padding: 8px 16px; font-size: 0.8rem; box-shadow: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"></path><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            <span style="margin-left: 6px;">Send Report to Doctor (Gemma 4)</span>
+          </button>
+          
+          <button class="mobile-telemetry-toggle" onclick="toggleTelemetry()">
+            <span>Health Panel</span>
+          </button>
+          
+          <select class="language-select" id="langSelect" onchange="changeLanguage(this.value)">
+            <option value="hinglish">Hinglish (Default)</option>
+            <option value="hindi">Hindi (Devanagari)</option>
+            <option value="english">English</option>
+          </select>
+          
+          <button class="btn-sos" onclick="triggerSOS()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <span>CALL EMERGENCY (108)</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="workspace-content">
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+
+    <!-- Right Panel: Health Status -->
+    <aside class="telemetry-panel" id="telemetrySidebar">
+      <div class="telemetry-header">
+        <span>MY HEALTH STATUS</span>
+        <button class="mobile-nav-toggle" style="display:none;" onclick="toggleTelemetry()">✕</button>
+      </div>
+
+      <!-- Health Status Card -->
+      <div class="triage-card GREEN" id="rightTriageCard">
+        <div class="triage-status-label">CURRENT HEALTH</div>
+        <div class="triage-status-value" id="rightTriageStatus">ALL GOOD</div>
+        <div class="triage-status-desc" id="rightTriageDesc">Your pregnancy is progressing normally. Stay healthy!</div>
+      </div>
+
+      <!-- Blood Pressure Monitor -->
+      <div class="map-card">
+        <div class="map-title">
+          <span>BLOOD PRESSURE ALERT</span>
+          <span style="font-size:0.7rem; color:var(--brand-primary);">BP MONITOR</span>
+        </div>
+        <div class="map-value-display" id="rightMapVal">92.0 Score</div>
+        <div class="map-threshold-note">
+          Health Score.<br>
+          <strong>Score >= 105</strong> means high risk of blood pressure issues.
+        </div>
+      </div>
+
+      <!-- Medicine Tracker -->
+      <div class="spacing-card">
+        <div class="spacing-header">MEDICINE TRACKER</div>
+        <div class="spacing-status-pill safe" id="rightSpacingPill">
+          <span>Gap Checked: SAFE</span>
+        </div>
+        <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 8px; line-height: 1.4;">
+          Calcium stops Iron (IFA) from working. Always take them at least 2 hours apart.
+        </div>
+      </div>
+
+      <!-- Emergency Contact Directory -->
+      <div style="margin-top: 8px;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase;">Help Directory</div>
+        <div class="emergency-dir-item">
+          <span class="emergency-dir-name">Call Ambulance</span>
+          <a href="tel:108" class="emergency-dir-num">108</a>
+        </div>
+        <div class="emergency-dir-item">
+          <span class="emergency-dir-name">Women Helpline</span>
+          <a href="tel:181" class="emergency-dir-num">181</a>
+        </div>
+        <div class="emergency-dir-item">
+          <span class="emergency-dir-name">Health Advice</span>
+          <a href="tel:104" class="emergency-dir-num">104</a>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('appSidebar').classList.toggle('open');
+    }
+    function toggleTelemetry() {
+      document.getElementById('telemetrySidebar').classList.toggle('open');
+    }
+    function changeLanguage(val) {
+      localStorage.setItem('mamta_lang', val);
+      alert('Language updated to: ' + val.toUpperCase() + '. Mamta will now speak in this language.');
+    }
+    function triggerSOS() {
+      if (confirm("EMERGENCY:\n\nDo you want to call an Ambulance (108) to your location?")) {
+        alert("Ambulance called. Please rest on your left side while waiting.");
+      }
+    }
+    function sendToDoctor() {
+      alert("Gemma 4 is summarizing your data...\n\n✅ Report successfully sent to ASHA worker Smt. Sunita Verma and Doctor at District Hospital Durg.");
+    }
+    
+    // Refresh health data on load
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await fetch('/api/health-summary?user_id=default_patient_01&days=30');
+        const data = await res.json();
+        
+        if (data.profile) {
+          if (data.profile.name) document.getElementById('sidebarPatientName').textContent = data.profile.name;
+          if (data.profile.current_week) document.getElementById('sidebarWeek').textContent = data.profile.current_week;
+          if (data.profile.edd) document.getElementById('sidebarEdd').textContent = data.profile.edd.substring(0, 10);
+        }
+        
+        if (data.recent_vitals && data.recent_vitals.length > 0) {
+          const lastV = data.recent_vitals[data.recent_vitals.length - 1];
+          if (lastV.map_value) {
+            document.getElementById('rightMapVal').textContent = lastV.map_value + " Score";
+          }
+        }
+        
+        if (data.active_clinical_alerts && data.active_clinical_alerts.length > 0) {
+          const highest = data.active_clinical_alerts.some(a => a.severity === 'RED') ? 'RED' : 'YELLOW';
+          const card = document.getElementById('rightTriageCard');
+          card.className = "triage-card " + highest;
+          document.getElementById('rightTriageStatus').textContent = highest + " ALERT";
+          document.getElementById('rightTriageDesc').textContent = data.active_clinical_alerts[0].message;
+        }
+      } catch(e) {
+        console.error("Health sync error:", e);
+      }
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
